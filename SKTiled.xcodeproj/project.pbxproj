@@ -774,6 +774,7 @@
 		4CF6DBF125544ED300D0331D /* CompressionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CompressionTests.swift; sourceTree = "<group>"; };
 		4CFEA3571D8D02D20055C150 /* staggered-64x192.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "staggered-64x192.png"; sourceTree = "<group>"; };
 		4CFEA35A1D8D04320055C150 /* hex-65x65-65x230.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "hex-65x65-65x230.png"; sourceTree = "<group>"; };
+		FFFF8AEF25683D0D003B515A /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1101,6 +1102,7 @@
 		4CBA615C1D8A048200B31FC1 = {
 			isa = PBXGroup;
 			children = (
+				FFFF8AEF25683D0D003B515A /* .gitignore */,
 				4CBA617E1D8A0A3900B31FC1 /* README.md */,
 				4C0E59501DC046E700921F75 /* CHANGELOG.md */,
 				4CBA61931D8A0A6C00B31FC1 /* Sources */,
