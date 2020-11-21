@@ -444,39 +444,43 @@ extension SKTiledDemoScene {
                 for object in self.focusObjects {
                     
                     if let tile = object as? SKTile {
-                        // Transform: origin is in the bottom left, upper right is +x,+y
-                        let coordWRTTile = touch.location(in: tile)
-                        
-                        var x: Int
-                        var y: Int
-                        if tile.getVertices().count > 0 {
-                            x = abs(Int((coordWRTTile.x + tile.getVertices()[2].x).rounded()))
-                            y = abs(Int((coordWRTTile.y + tile.getVertices()[1].y).rounded()))
-                        } else {
-                            x = abs(Int(coordWRTTile.x + tile.bounds.width / 2))
-                            y = abs(Int(coordWRTTile.y + tile.bounds.width / 2))
-                        }
-                        
-                        if 0 <= x && x < Int(tile.tileSize.width.rounded()) && 0 <= y && y < Int(tile.tileSize.height.rounded()) {
-                            if tile.getAlphaBitmask()[x][y] == 1 {
-                                currentTile = tile
-                                break
+                        if tile.visibleToCamera {
+                            // Transform: origin is in the bottom left, upper right is +x,+y
+                            let coordWRTTile = touch.location(in: tile)
+                            
+                            var x: Int
+                            var y: Int
+                            if tile.getVertices().count > 0 {
+                                x = abs(Int((coordWRTTile.x + tile.getVertices()[2].x).rounded()))
+                                y = abs(Int((coordWRTTile.y + tile.getVertices()[1].y).rounded()))
+                            } else {
+                                x = abs(Int(coordWRTTile.x + tile.bounds.width / 2))
+                                y = abs(Int(coordWRTTile.y + tile.bounds.width / 2))
+                            }
+                            
+                            if 0 <= x && x < Int(tile.tileSize.width.rounded()) && 0 <= y && y < Int(tile.tileSize.height.rounded()) {
+                                if tile.getAlphaBitmask()[x][y] == 1 {
+                                    currentTile = tile
+                                    break
+                                }
                             }
                         }
                     }
                     
                     if let obj = object as? SKTileObject {
                         if let proxy = obj.proxy {
-                            if (currentObject == nil) {
-                                let coordWRTTile = touch.location(in: proxy.reference!)
-                                let x = Int((coordWRTTile.x + proxy.reference!.size.width / 2).rounded())
-                                let y = Int((coordWRTTile.y + proxy.reference!.size.height / 2).rounded())
-                                
-                                if 0 <= x && x < Int(proxy.reference!.size.width.rounded()) && 0 <= y && y < Int(proxy.reference!.size.height.rounded()) {
-                                    if proxy.reference!.getAlphaBitmask()[x][y] == 1 {
-                                        currentObject = proxy
-                                        proxy.isFocused = proxyIsFocused
-                                        break
+                            if proxy.visibleToCamera {
+                                if (currentObject == nil) {
+                                    let coordWRTTile = touch.location(in: proxy.reference!)
+                                    let x = Int((coordWRTTile.x + proxy.reference!.size.width / 2).rounded())
+                                    let y = Int((coordWRTTile.y + proxy.reference!.size.height / 2).rounded())
+                                    
+                                    if 0 <= x && x < Int(proxy.reference!.size.width.rounded()) && 0 <= y && y < Int(proxy.reference!.size.height.rounded()) {
+                                        if proxy.reference!.getAlphaBitmask()[x][y] == 1 {
+                                            currentObject = proxy
+                                            proxy.isFocused = proxyIsFocused
+                                            break
+                                        }
                                     }
                                 }
                             }
@@ -485,15 +489,17 @@ extension SKTiledDemoScene {
                     
                     
                     if let proxy = object as? TileObjectProxy {
-                        let coordWRTTile = touch.location(in: proxy.reference!)
-                        let x = Int((coordWRTTile.x + proxy.reference!.size.width / 2).rounded())
-                        let y = Int((coordWRTTile.y + proxy.reference!.size.height / 2).rounded())
-                        
-                        if 0 <= x && x < Int(proxy.reference!.size.width.rounded()) && 0 <= y && y < Int(proxy.reference!.size.height.rounded()) {
-                            if proxy.reference!.getAlphaBitmask()[x][y] == 1 {
-                                currentObject = proxy
-                                proxy.isFocused = proxyIsFocused
-                                break
+                        if proxy.visibleToCamera {
+                            let coordWRTTile = touch.location(in: proxy.reference!)
+                            let x = Int((coordWRTTile.x + proxy.reference!.size.width / 2).rounded())
+                            let y = Int((coordWRTTile.y + proxy.reference!.size.height / 2).rounded())
+                            
+                            if 0 <= x && x < Int(proxy.reference!.size.width.rounded()) && 0 <= y && y < Int(proxy.reference!.size.height.rounded()) {
+                                if proxy.reference!.getAlphaBitmask()[x][y] == 1 {
+                                    currentObject = proxy
+                                    proxy.isFocused = proxyIsFocused
+                                    break
+                                }
                             }
                         }
                     }
