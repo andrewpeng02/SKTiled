@@ -126,6 +126,9 @@ public class SKTileset: NSObject, SKTiledObject {
     public var globalRange: ClosedRange<Int> {
         return firstGID...(firstGID + lastGID)
     }
+    
+    /// Cached alpha bitasks in a dict [id -> [[Int]]]
+    public var alphaBitmasks: [Int: [[Int]]] = [:]
 
     // MARK: - Spacing
 

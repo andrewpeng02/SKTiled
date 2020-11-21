@@ -296,7 +296,19 @@ open class SKTileObject: SKShapeNode, SKTiledObject {
 
     /// Text formatting attributes (for text objects).
     open var textAttributes: TextObjectAttributes!
-
+    
+    public func getAlphaBitmask() -> [[Int]] {
+        if let tileData = self.tileData {
+            if tileData.tileset.alphaBitmasks[tileData.id] == nil {
+                if let texture = tileData.texture {
+                    let img = UIImage(cgImage: texture.cgImage())
+                    tileData.tileset.alphaBitmasks[tileData.id] = img.getAlphaMask()
+                }
+            }
+            return tileData.tileset.alphaBitmasks[tileData.id]!
+        }
+        return [[-1]]
+    }
 
     ///Text object render quality.
     open var renderQuality: CGFloat = TiledGlobals.default.renderQuality.object {
@@ -647,6 +659,9 @@ open class SKTileObject: SKShapeNode, SKTiledObject {
                     // flipped tile flags
                     tileSprite.xScale = (tileData.flipHoriz == true) ? -1 : 1
                     tileSprite.yScale = (tileData.flipVert == true) ? -1 : 1
+                    
+                    // generate alpha bitmask
+                    _ = getAlphaBitmask()
 
                     // add to tile cache
                     NotificationCenter.default.post(

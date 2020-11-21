@@ -234,6 +234,7 @@ open class SKTile: SKSpriteNode {
         self.animationKey += "-\(data.globalID)"
         self.tileSize = tileset.tileSize
         super.init(texture: data.texture, color: SKColor.clear, size: fabs(tileset.tileSize))
+        _ = getAlphaBitmask()
 
         // get render mode from tile data properties
         if let rawRenderMode = data.intForKey("renderMode") {
@@ -287,6 +288,16 @@ open class SKTile: SKSpriteNode {
         tileSize = CGSize.zero
         super.init(texture: texture, color: SKColor.clear, size: tileSize)
         colorBlendFactor = 0
+    }
+    
+    public func getAlphaBitmask() -> [[Int]] {
+        if tileData.tileset.alphaBitmasks[self.tileData.id] == nil {
+            if let texture = self.texture {
+                let img = UIImage(cgImage: texture.cgImage())
+                tileData.tileset.alphaBitmasks[self.tileData.id] = img.getAlphaMask()
+            }
+        }
+        return tileData.tileset.alphaBitmasks[self.tileData.id]!
     }
 
 

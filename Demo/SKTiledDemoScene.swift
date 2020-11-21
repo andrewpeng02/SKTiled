@@ -422,36 +422,115 @@ public class SKTiledDemoScene: SKTiledScene {
 #if os(iOS) || os(tvOS)
 // Touch-based event handling
 extension SKTiledDemoScene {
-
     override open func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let tilemap = tilemap else { return }
         let defaultLayer = tilemap.defaultLayer
-
+        
         for touch in touches {
-
-            // get the position in the defaultLayer
-            let positionInLayer = defaultLayer.touchLocation(touch)
-
-            let coord = defaultLayer.coordinateAtTouchLocation(touch)
-
-
-            // update the tile information label
-            let coordStr = "Coord: \(coord.shortDescription), \(positionInLayer.roundTo())"
-
-            updateTileInfo(msg: coordStr)
-
-            // tile properties output
-            var propertiesInfoString = ""
-            if let tile = tilemap.firstTileAt(coord: coord) {
-                propertiesInfoString = tile.tileData.description
+            let locationInMap = touch.location(in: tilemap)
+            let nodesUnderCursor = tilemap.nodes(at: locationInMap)
+            
+            self.focusObjects = nodesUnderCursor.filter { node in
+                (node as? SKTiledGeometry != nil)
             }
+            
+            if !self.focusObjects.isEmpty {
+                var currentTile: SKTile?
+                var currentObject: TileObjectProxy?
+                
+                
+                let doShowTileBounds = TiledGlobals.default.debug.mouseFilters.contains(.tilesUnderCursor)
+                let proxyIsFocused = (tilemap.showObjects == false) ? TiledGlobals.default.debug.mouseFilters.contains(.objectsUnderCursor) : false
+                for object in self.focusObjects {
+                    
+                    if let tile = object as? SKTile {
+                        // Transform: origin is in the bottom left, upper right is +x,+y
+                        let coordWRTTile = touch.location(in: tile)
+                        
+                        var x: Int
+                        var y: Int
+                        if tile.getVertices().count > 0 {
+                            x = abs(Int((coordWRTTile.x + tile.getVertices()[2].x).rounded()))
+                            y = abs(Int((coordWRTTile.y + tile.getVertices()[1].y).rounded()))
+                        } else {
+                            x = abs(Int(coordWRTTile.x + tile.bounds.width / 2))
+                            y = abs(Int(coordWRTTile.y + tile.bounds.width / 2))
+                        }
+                        
+                        if 0 <= x && x < Int(tile.tileSize.width.rounded()) && 0 <= y && y < Int(tile.tileSize.height.rounded()) {
+                            if tile.getAlphaBitmask()[x][y] == 1 {
+                                currentTile = tile
+                                break
+                            }
+                        }
+                    }
+                    
+                    if let obj = object as? SKTileObject {
+                        if let proxy = obj.proxy {
+                            if (currentObject == nil) {
+                                let coordWRTTile = touch.location(in: proxy.reference!)
+                                let x = Int((coordWRTTile.x + proxy.reference!.size.width / 2).rounded())
+                                let y = Int((coordWRTTile.y + proxy.reference!.size.height / 2).rounded())
+                                
+                                if 0 <= x && x < Int(proxy.reference!.size.width.rounded()) && 0 <= y && y < Int(proxy.reference!.size.height.rounded()) {
+                                    if proxy.reference!.getAlphaBitmask()[x][y] == 1 {
+                                        currentObject = proxy
+                                        proxy.isFocused = proxyIsFocused
+                                        break
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    
+                    if let proxy = object as? TileObjectProxy {
+                        let coordWRTTile = touch.location(in: proxy.reference!)
+                        let x = Int((coordWRTTile.x + proxy.reference!.size.width / 2).rounded())
+                        let y = Int((coordWRTTile.y + proxy.reference!.size.height / 2).rounded())
+                        
+                        if 0 <= x && x < Int(proxy.reference!.size.width.rounded()) && 0 <= y && y < Int(proxy.reference!.size.height.rounded()) {
+                            if proxy.reference!.getAlphaBitmask()[x][y] == 1 {
+                                currentObject = proxy
+                                proxy.isFocused = proxyIsFocused
+                                break
+                            }
+                        }
+                    }
+                }
+                
+                if let currentTile = currentTile {
+                    let coordStr = "Coord: \(locationInMap)"
 
-            updatePropertiesInfo(msg: propertiesInfoString)
+                    updateTileInfo(msg: coordStr)
+
+                    // tile properties output
+                    let propertiesInfoString = currentTile.tileData.description
+                    updatePropertiesInfo(msg: propertiesInfoString)
+                }
+                
+                
+                if let currentObject = currentObject {
+                    if let object = currentObject.reference {
+                        NotificationCenter.default.post(
+                            name: Notification.Name.Demo.ObjectUnderCursor,
+                            object: object,
+                            userInfo: nil
+                        )
+                    }
+                }
+                
+                
+                currentTile?.frameColor = TiledGlobals.default.debug.tileHighlightColor
+                currentTile?.highlightColor = TiledGlobals.default.debug.tileHighlightColor
+                currentTile?.showBounds = true
+            }
+            
+            
         }
     }
 }
 #endif
-
 
 #if os(macOS)
 

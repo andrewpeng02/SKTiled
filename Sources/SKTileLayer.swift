@@ -515,7 +515,6 @@ public class SKTileLayer: SKTiledLayerObject {
             let Tile = (tilemap.delegate != nil) ? tilemap.delegate!.objectForTileType(named: tileData.type) : SKTile.self
             
             if let tile = Tile.init(data: tileData) {
-                
                 // set the tile overlap amount
                 tile.setTileOverlap(tilemap.tileOverlap)
                 tile.highlightColor = highlightColor
@@ -528,7 +527,9 @@ public class SKTileLayer: SKTiledLayerObject {
                 let tilePosition = pointForCoordinate(coord: coord, offsetX: tileData.tileset.tileOffset.x, offsetY: tileData.tileset.tileOffset.y)
                 
                 // add to the layer
+                //tile.tileSize = CGSize(width: 10, height: 10)
                 addChild(tile)
+                //tile.tileSize = CGSize(width: 130, height: 230)
                 
                 // set orientation & position
                 tile.orientTile()
